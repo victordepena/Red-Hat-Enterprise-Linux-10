@@ -6,7 +6,7 @@
 
 ## 🎬 Playlist
 
-> 🔴 **YouTube:** `https://www.youtube.com/playlist?list=PLQ9VDfI34EckrjTbpl6UQh6QGQlRjJ9MQ`
+> 🔴 **YouTube:** https://www.youtube.com/playlist?list=PLQ9VDfI34EckrjTbpl6UQh6QGQlRjJ9MQ
 
 ---
 
