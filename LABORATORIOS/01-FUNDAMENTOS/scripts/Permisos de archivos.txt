@@ -1,0 +1,40 @@
+Paso 1 — Crear carpeta, archivo y editarlo con vi
+mkdir materia
+cd materia
+vi estudiante.txt
+Dentro de vi:
+i                        
+Nombre: Victor De Pena
+Matricula: 2023-0506
+ESC                      
+:wq               
+
+-------------------------------
+
+Paso 2 — Permisos solo para el usuario propietario (control total)
+chmod 700 estudiante.txt
+ls -l estudiante.txt
+
+-------------------------------
+
+Paso 3 — Permisos solo para el grupo propietario (control total)
+chmod 070 estudiante.txt
+ls -l estudiante.txt
+
+-------------------------------
+
+Paso 4 — Crear materia2 y copiar el archivo
+cd ..
+mkdir materia2
+cd materia
+cp estudiante.txt ../materia2/
+ls materia2/
+
+--------------------------------
+
+Paso 5 — Eliminar carpeta materia junto con el archivo
+chmod 700 materia/estudiante.txt 
+rm -rf materia/
+ls
+
+                              
