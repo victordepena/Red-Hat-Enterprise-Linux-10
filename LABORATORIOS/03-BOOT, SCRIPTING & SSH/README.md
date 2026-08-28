@@ -4,12 +4,7 @@
 
 [⬅️ Volver al índice](../README.md)
 
-## 🎬 Playlists
-
-- Práctica 01: `PENDIENTE`
-- Práctica 02: `PENDIENTE`
-- Práctica 03: `PENDIENTE`
-
+## 🎬 Playlists  https://www.youtube.com/playlist?list=PLcPUTSzk0sXI
 ---
 
 # 🧪 Práctica 01 — GRUB y recuperación de acceso
