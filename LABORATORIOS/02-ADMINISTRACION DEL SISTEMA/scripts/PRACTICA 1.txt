@@ -1,0 +1,34 @@
+1. Actualización y mejora del sistema
+sudo dnf update -y && sudo dnf upgrade -y
+----------------------------------------------
+2. Limpiar terminal
+clear
+----------------------------------------------
+1. Actualización y mejora del sistema
+sudo dnf repolist
+sudo dnf repolist all
+----------------------------------------------
+5. Instalación del repositorio EPEL
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm -y
+----------------------------------------------
+6. Instalación del monitor de sistema
+sudo dnf install btop -y
+----------------------------------------------
+7. Ejecución de la herramienta
+btop
+----------------------------------------------
+9. Desinstalación de herramienta
+sudo dnf remove btop -y
+----------------------------------------------
+10. Eliminación de archivos de configuración locales
+rm -rf ~/.config/btop
+
+
+Instalación del GPG check
+
+sudo dnf clean all
+sudo dnf makecache
+sudo dnf update
+
+sudo rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+rpm -qa gpg-pubkey*
