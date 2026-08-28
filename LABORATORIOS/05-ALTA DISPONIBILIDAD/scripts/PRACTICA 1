@@ -1,0 +1,53 @@
+================================================================================
+CONFIGURACIÓN EN EL SERVIDOR PRIMARIO (Usando sudo)
+================================================================================
+
+Paso 1: Generar la llave SSH para root y enviarla (Elimina petición de contraseña)
+$ sudo ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa
+$ sudo ssh-copy-id hack.u@172.29.218.66
+(Escribe 'yes' si lo solicita e ingresa la contraseña de 'hack.u' por última vez)
+
+Paso 2: Crear la carpeta de origen y los 101 archivos de prueba
+$ sudo mkdir -p /home/hack.u/sincronizacion_practica
+$ sudo touch /home/hack.u/sincronizacion_practica/archivo{1..100}.txt
+$ sudo touch /home/hack.u/sincronizacion_practica/archivo_final.txt
+
+Paso 3: Crear y editar el script de sincronización automatizada
+$ sudo nano /home/hack.u/sincronizar.sh
+
+--- PEGA ESTE CONTENIDO EXACTO DENTRO DEL SCRIPT ---
+#!/bin/bash
+# Script de sincronización automática - Práctica 1
+
+ORIGEN="/home/hack.u/sincronizacion_practica/"
+DESTINO="hack.u@172.29.218.66:/home/hack.u/sincronizacion_remota/"
+
+/usr/bin/rsync -avz "$ORIGEN" "$DESTINO"
+----------------------------------------------------
+(Guarda con Ctrl+O, Enter, y sal con Ctrl+X)
+
+Paso 4: Asignar permisos de ejecución al script
+$ sudo chmod +x /home/hack.u/sincronizar.sh
+
+Paso 5: Realizar una ejecución de prueba manual para validar
+$ sudo /bin/bash /home/hack.u/sincronizar.sh
+(Debe transferir los archivos sin pedir contraseña ni mostrar errores de ruta)
+
+Paso 6: Configurar la tarea programada en el demonio Cron (Crontab)
+$ sudo crontab -e
+
+--- PEGA ESTA ÚNICA LÍNEA EN EL CRONTAB ---
+* * * * * /bin/bash /home/hack.u/sincronizar.sh > /dev/null 2>&1
+-------------------------------------------
+(Guarda y sal del editor)
+
+
+================================================================================
+VERIFICACIÓN FINAL DESDE EL SERVIDOR SECUNDARIO (IP: 172.29.218.66)
+================================================================================
+
+Espere un minuto para que el Cron ejecute la sincronización en segundo plano y valide:
+$ sudo ls -la /home/hack.u/sincronizacion_remota/
+
+Deberá observar la lista completa con los 100 archivos base y el archivo 'archivo_final.txt'.
+================================================================================
