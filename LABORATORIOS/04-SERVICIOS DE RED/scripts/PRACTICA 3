@@ -1,0 +1,47 @@
+1. Actualización e Instalación de CUPS
+
+# Actualizar los repositorios del sistema
+sudo dnf update -y
+
+# Instalar el servidor CUPS y sus herramientas de filtrado
+sudo dnf install cups cups-filters -y
+sudo dnf install cups-pdf --nogpgcheck
+
+# Iniciar y habilitar el servicio para que arranque con el sistema
+sudo systemctl start cups
+sudo systemctl enable cups
+
+2. Configuración del Firewall (Apertura de Puertos)
+
+# Abrir el puerto de impresión en TCP y UDP
+sudo firewall-cmd --permanent --add-port=631/tcp
+sudo firewall-cmd --permanent --add-port=631/udp
+
+# Recargar el firewall para aplicar cambios
+sudo firewall-cmd --reload
+
+# VERIFICACIÓN EN VIDEO: Confirmar que los puertos están abiertos
+sudo firewall-cmd --list-ports
+
+3. Permisos de Administración y Red (cupsd.conf)
+Para editar el archivo de configuración rápidamente sin pelear con nano o vi en vivo, puedes ejecutar estos comandos sed que modifican las líneas exactas automáticamente:
+
+# Permitir que escuche en toda la red (cambiar Listen por Port)
+sudo sed -i 's/Listen localhost:631/Port 631/' /etc/cups/cupsd.conf
+
+# Permitir acceso general a la raíz del servidor
+sudo sed -i '/<Location \/>/,/<\/Location>/ s/Order allow,deny/Order allow,deny\n  Allow all/' /etc/cups/cupsd.conf
+
+# Permitir acceso al panel de administración remota
+sudo sed -i '/<Location \/admin>/,/<\/Location>/ s/Order allow,deny/Order allow,deny\n  Allow all/' /etc/cups/cupsd.conf
+
+# Añadir tu usuario actual al grupo administrativo para loguearte en la web
+sudo usermod -aG wheel $USER
+
+# Reiniciar CUPS para aplicar toda la nueva configuración
+sudo systemctl restart cups
+
+4. Obtener la IP del Servidor
+
+# Mostrar la IP de tu servidor para usarla en el navegador del cliente
+ip route get 1.1.1.1 | awk '{print $7}'
