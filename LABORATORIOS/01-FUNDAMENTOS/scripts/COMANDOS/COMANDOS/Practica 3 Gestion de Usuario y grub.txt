@@ -1,0 +1,45 @@
+Practica 3: Gestion de Usuario y grupos
+
+
+Bloque 1 — Crear usuario con tu nombre y agregarlo al grupo wheel
+
+sudo useradd -m -s /bin/bash Victor
+
+- Asignarle contraseña
+sudo passwd tunombre
+
+- Agregarlo al grupo wheel
+sudo usermod -aG wheel Victor
+
+- Verificacion
+groups tunombre
+
+----------------------------------
+
+Bloque 2 — Crear grupo guest, crear usuario y agregarlo
+
+- Crear el grupo guest
+sudo groupadd guest
+
+- Crear el usuario
+sudo useradd -m -s /bin/bash visitante
+
+- Agregar el usuario al grupo guest
+sudo usermod -aG guest visitante
+
+- Verificacion
+groups visitante
+
+------------------------------------
+
+Bloque 3 — Eliminar el usuario y el grupo creados
+
+- Eliminar el usuario (con -r se borra también su directorio home)
+sudo userdel -r visitante
+
+- Eliminar el grupo guest
+sudo groupdel guest
+
+- Verificar que ya no existen
+getent group guest
+id visitante
