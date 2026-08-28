@@ -1,0 +1,88 @@
+--- PASO 1: Instalar paquetes ---
+# Instala postfix (servidor SMTP), mailx (cliente para enviar correos desde terminal),
+# cyrus-sasl-plain y md5 (autenticación con Gmail), postfix-cdb (soporte de base de datos para contraseñas)
+sudo dnf install -y postfix mailx cyrus-sasl-plain cyrus-sasl-md5 postfix-cdb --nogpgcheck
+
+
+--- PASO 2: Habilitar e iniciar Postfix ---
+# Hace que postfix arranque automáticamente cada vez que el servidor se reinicie
+sudo systemctl enable postfix
+
+# Inicia el servicio postfix ahora mismo
+sudo systemctl start postfix
+
+
+--- PASO 3: Configurar main.cf ---
+# Abre el archivo principal de configuración de postfix
+sudo nano /etc/postfix/main.cf
+
+# Agrega al FINAL del archivo lo siguiente:
+
+# Define que el correo no se envía directo sino a través del servidor de Gmail
+relayhost = [smtp.gmail.com]:587
+
+# Activa la autenticación (usuario y contraseña) al conectarse a Gmail
+smtp_sasl_auth_enable = yes
+
+# Indica dónde están guardadas las credenciales
+smtp_sasl_password_maps = cdb:/etc/postfix/sasl_passwd
+
+# No permite conexiones anónimas (sin usuario/contraseña)
+smtp_sasl_security_options = noanonymous
+smtp_sasl_tls_security_options = noanonymous
+
+# Activa el cifrado TLS para proteger la conexión con Gmail
+smtp_use_tls = yes
+
+# Obliga a que la conexión sea siempre cifrada
+smtp_tls_security_level = encrypt
+
+# Archivo con los certificados de seguridad del sistema para verificar a Gmail
+smtp_tls_CAfile = /etc/pki/tls/certs/ca-bundle.crt
+
+# Desactiva versiones antiguas e inseguras de SSL
+smtp_tls_protocols = !SSLv2, !SSLv3
+
+
+--- PASO 4: Crear credenciales Gmail ---
+# Crea el archivo donde se guarda el usuario y contraseña de Gmail
+sudo nano /etc/postfix/sasl_passwd
+
+# Escribe esto adentro (reemplaza con tu correo y App Password):
+[smtp.gmail.com]:587    TU_CORREO@gmail.com:TU_APP_PASSWORD
+
+
+--- PASO 5: Aplicar credenciales ---
+# Restringe el acceso al archivo de contraseñas (solo root puede leerlo)
+sudo chmod 600 /etc/postfix/sasl_passwd
+
+# Convierte el archivo de texto a base de datos que postfix puede leer
+sudo postmap cdb:/etc/postfix/sasl_passwd
+
+# Reinicia postfix para aplicar todos los cambios
+sudo systemctl restart postfix
+
+
+--- PASO 6: Enviar correo al maestro ---
+# Envia el correo con nombre y matricula al profesor
+echo "Nombre: Victor Jose De Pena Bernard
+Matricula: 2023-0506" | mail -s "MambruSeFueALaGuerra" \
+  victordepena18@gmail.com
+
+
+--- PASO 7: Verificar envio ---
+# Muestra el log en tiempo real, busca "status=sent" para confirmar entrega
+sudo tail -f /var/log/maillog
+
+
+--- EXTRA: Enviar correo personalizado ---
+# Enviar un correo cualquiera a cualquier destinatario
+echo "Cuidado, ya tengo ubicado" | mail -s "Aviso" \
+  TUCORREO@gmail.com
+
+
+=====================================================
+  NOTA: La App Password se genera en:
+  https://myaccount.google.com/apppasswords
+  (Requiere tener 2-Step Verification activado)
+=====================================================
