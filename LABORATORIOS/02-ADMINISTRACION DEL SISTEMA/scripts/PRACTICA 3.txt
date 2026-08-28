@@ -1,0 +1,23 @@
+ 1 — Verificar el disco
+lsblk
+
+ 2 — Formatear como ext4
+sudo mkfs.ext4 /dev/nvme0n2
+
+3 — Crear carpeta en el Escritorio y montar
+mkdir ~/Desktop/Midisco2
+sudo mount /dev/nvme0n2 ~/Desktop/Midisco2
+lsblk
+
+4 — Crear el archivo
+cd ~/Desktop/Midisco2
+sudo touch AdrianAlcantara.txt
+ls -la
+
+ 5 — Desmontar y montar en /mnt
+cd ~
+sudo umount ~/Desktop/Midisco2
+sudo mount /dev/nvme0n2 /mnt
+
+6 — Comprobar que el archivo sigue en /mnt
+ls -la /mnt
