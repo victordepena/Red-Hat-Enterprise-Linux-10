@@ -1,0 +1,17 @@
+*.iso
+*.qcow2
+*.vdi
+*.vmdk
+*.ova
+*.ovf
+*.zip
+*.rar
+.env
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
