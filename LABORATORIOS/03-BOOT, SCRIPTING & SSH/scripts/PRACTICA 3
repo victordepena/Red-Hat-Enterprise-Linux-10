@@ -1,0 +1,18 @@
+1. Configuración de Red y Validación Inicial
+sudo systemctl restart NetworkManager
+ifconfig
+
+ping 172.29.114.120
+
+2. Habilitar SSH y Primera Conexión
+sudo systemctl start sshd
+sudo systemctl status sshd
+
+ssh redhat@172.29.114.120
+
+3. Generación y Envío de Llaves desde Windows
+ssh-keygen -t rsa -b 4096
+type %USERPROFILE%\.ssh\id_rsa.pub | ssh redhat@172.29.114.120 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys"
+
+4. Prueba Final
+ssh redhat@172.29.114.120
