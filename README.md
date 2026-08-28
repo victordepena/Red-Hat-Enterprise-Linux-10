@@ -22,7 +22,7 @@
 
 ---
 
-## ✨ ¿Qué es este repositorio?
+##  ¿Qué es este repositorio?
 
 Este repositorio convierte una colección de prácticas de administración Linux en un **laboratorio documentado y reproducible sobre Red Hat Enterprise Linux 10**.
 
