@@ -1,0 +1,116 @@
+================================================================================
+GUÍA DEFINITIVA DE COMANDOS - LABORATORIO DE ALTA DISPONIBILIDAD (KEEPALIVED)
+================================================================================
+IP Virtual (VIP): 172.27.218.100
+sudo pcs resource create IP_Flotante2 ocf:heartbeat:IPaddr2 ip=172.27.218.150 cidr_netmask=16 nic=ens160 op monitor interval=30s
+
+--------------------------------------------------------------------------------
+1. SERVIDOR MASTER (172.27.222.108)
+--------------------------------------------------------------------------------
+
+A) Instalación y Directorios:
+   sudo dnf install -y keepalived httpd --nogpgcheck
+   sudo mkdir -p /etc/keepalived /var/www/holamundo
+
+B) Configuración de Keepalived:
+   Abrir archivo: sudo nano /etc/keepalived/keepalived.conf
+   Contenido a pegar:
+
+global_defs {
+    router_id rhel10_master
+}
+vrrp_script check_httpd {
+    script "pidof httpd"
+    interval 2
+    weight 2
+}
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens160
+    virtual_router_id 51
+    priority 101
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass SecHttp123
+    }
+    virtual_ipaddress {
+        172.27.218.100/16
+    }
+    track_script {
+        check_httpd
+    }
+}
+
+C) Configuración Web, Firewall y Servicios:
+   echo "<h1>Hola desde SERVER 1 (Master - 172.27.222.108)</h1>" | sudo tee /var/www/holamundo/index.html
+   sudo chmod 644 /var/www/holamundo/index.html
+   sudo rm -f /etc/httpd/conf.d/welcome.conf
+   sudo firewall-cmd --add-service=http --permanent
+   sudo firewall-cmd --add-protocol=vrrp --permanent
+   sudo firewall-cmd --reload
+   sudo systemctl enable --now httpd
+   sudo systemctl enable --now keepalived
+
+--------------------------------------------------------------------------------
+2. SERVIDOR BACKUP (172.27.218.146)
+--------------------------------------------------------------------------------
+
+A) Instalación y Directorios:
+   sudo dnf install -y keepalived httpd --nogpgcheck
+   sudo mkdir -p /etc/keepalived /var/www/holamundo
+
+B) Configuración de Keepalived:
+   Abrir archivo: sudo nano /etc/keepalived/keepalived.conf
+   Contenido a pegar:
+
+global_defs {
+    router_id rhel10_backup
+}
+vrrp_script check_httpd {
+    script "pidof httpd"
+    interval 2
+    weight 2
+}
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens224
+    virtual_router_id 51
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass SecHttp123
+    }
+    virtual_ipaddress {
+        172.27.218.100/16
+    }
+    track_script {
+        check_httpd
+    }
+}
+
+C) Configuración Web, Firewall y Servicios:
+   echo "<h1>Hola desde SERVER 2 (Backup - 172.27.218.146)</h1>" | sudo tee /var/www/holamundo/index.html
+   sudo chmod 644 /var/www/holamundo/index.html
+   sudo firewall-cmd --add-service=http --permanent
+   sudo firewall-cmd --add-protocol=vrrp --permanent
+   sudo firewall-cmd --reload
+   sudo systemctl enable --now httpd
+   sudo systemctl enable --now keepalived
+
+--------------------------------------------------------------------------------
+3. COMANDOS DE DIAGNÓSTICO Y PRUEBAS
+--------------------------------------------------------------------------------
+
+- Ver si la IP Virtual está levantada en la interfaz:
+  ip addr show
+
+- Probar localmente qué responde Apache:
+  curl http://localhost
+
+- Simular la caída apagando Apache en el Master:
+  sudo systemctl stop httpd
+
+- Recuperar el estado inicial encendiendo Apache en el Master:
+  sudo systemctl start httpd
