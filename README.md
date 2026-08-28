@@ -1,6 +1,6 @@
 <div align="center">
 
-# Red Hat Enterprise Linux 10
+# 🔴 Red Hat Enterprise Linux 10
 
 ### Laboratorio de Administración Linux • Guía práctica • Evidencias • Automatización
 
@@ -12,6 +12,9 @@
 </p>
 
 **De la instalación de RHEL a alta disponibilidad, seguridad, almacenamiento, servicios, contenedores y automatización.**
+
+> 👨‍💻 **Autor:** **Victor de Peña**  
+> 🎓 **Estudiante de Seguridad Informática — ITLA**
 
 [🧭 Mapa de laboratorios](#-mapa-de-laboratorios) • [📚 Módulos](#-módulos) • [🎥 Playlists](#-playlists) • [🧪 Evidencias](#-cómo-usar-cada-laboratorio) • [📖 Referencias](#-documentación-base)
 
