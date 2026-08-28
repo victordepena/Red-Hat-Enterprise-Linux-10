@@ -81,18 +81,16 @@ Cada práctica tiene un bloque preparado para su playlist o video de YouTube. Lo
 
 | Módulo | Práctica | YouTube |
 |---|---|---|
-| 01 | P1–P4 | `PENDIENTE` |
-| 02 | P1–P3 | `PENDIENTE` |
-| 03 | P1–P3 | `PENDIENTE` |
-| 04 | P1–P3 | `PENDIENTE` |
-| 05 | P1–P3 | `PENDIENTE` |
-| 06 | P1–P4 | `PENDIENTE` |
-| 07 | P1–P3 | `PENDIENTE` |
-| 08 | P1–P3 | `PENDIENTE` |
-| 09 | P1–P5 | `PENDIENTE` |
+| 01 | P1–P4 | https://www.youtube.com/playlist?list=PLQ9VDfI34EckrjTbpl6UQh6QGQlRjJ9MQ |
+| 02 | P1–P3 | https://www.youtube.com/playlist?list=PLQ9VDfI34EckTTf6qa4jeIUFh4jxn7If- |
+| 03 | P1–P3 | https://www.youtube.com/playlist?list=PLcPUTSzk0sXI |
+| 04 | P1–P3 | https://www.youtube.com/playlist?list=PLQ9VDfI34EclPKPJziFwlAyN4DjNBG0Uj |
+| 05 | P1–P3 | https://www.youtube.com/playlist?list=PLFrQuLFGh3i0 |
+| 06 | P1–P4 | https://www.youtube.com/playlist?list=PLBJrGewVrphc |
+| 07 | P1–P3 | https://www.youtube.com/playlist?list=PLHdw_3GmkLLA |
+| 08 | P1–P3 | https://www.youtube.com/playlist?list=PLN6TVtpUmTrY |
+| 09 | P1–P5 | https://www.youtube.com/playlist?list=PLYKTLDoHjKa0 |
 | 10 | P1 | `PENDIENTE` |
-
-> Cuando tengas los links, solo cambia `PENDIENTE` por la URL de cada playlist en el README correspondiente.
 
 ---
 
@@ -257,6 +255,6 @@ La base técnica de la modernización de estas prácticas es la documentación o
 
 <div align="center">
 
-**🔴 Red Hat Enterprise Linux 10 · Laboratorios documentados como infraestructura real**
+**Red Hat Enterprise Linux 10 · Laboratorios documentados como infraestructura real**
 
 </div>
