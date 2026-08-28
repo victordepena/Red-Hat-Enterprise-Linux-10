@@ -1,0 +1,138 @@
+========================================================================
+GUÍA COMPLETA DE COMANDOS Y CÓDIGO - PRÁCTICA DE SERVIDORES WEB (APACHE)
+========================================================================
+
+Este documento contiene todos los comandos ejecutados y el código fuente
+HTML/Apache utilizado para configurar los dos Virtual Hosts (Puertos 80 y 8080).
+
+------------------------------------------------------------------------
+1. INSTALACIÓN E INICIO DE APACHE
+------------------------------------------------------------------------
+# desactivar por completo el gpo
+sudo dnf install httpd --nogpgcheck --setopt=repo_gpgcheck=0
+
+# Instalar el servidor web Apache (httpd)
+sudo dnf install httpd -y
+
+# Habilitar e iniciar el servicio automáticamente
+sudo systemctl enable --now httpd
+
+
+------------------------------------------------------------------------
+2. CREACIÓN DE DIRECTORIOS PARA LOS SITIOS WEB
+------------------------------------------------------------------------
+# Crear directorio para el Sitio 1 (Puerto 80)
+sudo mkdir -p /var/www/holamundo
+
+# Crear directorio para el Sitio 2 (Puerto 8080)
+sudo mkdir -p /var/www/misdatos
+
+
+------------------------------------------------------------------------
+3. CONTENIDO DE LOS ARCHIVOS HTML
+------------------------------------------------------------------------
+
+--- ARCHIVO 1: /var/www/holamundo/index.html ---
+Comando para crear/editar: sudo nano /var/www/holamundo/index.html
+
+Código a pegar:
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitio 1 - Puerto 80</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 100px; background-color: #f4f4f9; }
+        h1 { color: #333; font-size: 3em; }
+    </style>
+</head>
+<body>
+    <h1>Hola Mundo</h1>
+</body>
+</html>
+
+
+--- ARCHIVO 2: /var/www/misdatos/index.html ---
+Comando para crear/editar: sudo nano /var/www/misdatos/index.html
+
+Código a pegar (Reemplaza los datos entre corchetes):
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitio 2 - Puerto 8080</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #eef2f3; margin: 40px; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 500px; }
+        h1 { color: #0056b3; margin-top: 0; font-size: 24px; }
+        h2 { color: #555; font-size: 20px; }
+        h3 { color: #777; font-weight: normal; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Nombre: Victor</h1>
+        <h2>Matrícula: 2023-0506</h2>
+        <h3>Materia: [Nombre de la Materia Aquí]</h3>
+    </div>
+</body>
+</html>
+
+
+------------------------------------------------------------------------
+4. CONFIGURACIÓN DE HOSTS VIRTUALES (VIRTUAL HOSTS)
+------------------------------------------------------------------------
+
+--- CONFIGURACIÓN 1: /etc/httpd/conf.d/holamundo.conf ---
+Comando para crear/editar: sudo nano /etc/httpd/conf.d/holamundo.conf
+
+Código a pegar:
+<VirtualHost *:80>
+    DocumentRoot /var/www/holamundo
+    ErrorLog /var/log/httpd/holamundo_error.log
+    CustomLog /var/log/httpd/holamundo_access.log combined
+</VirtualHost>
+
+
+--- CONFIGURACIÓN 2: /etc/httpd/conf.d/misdatos.conf ---
+Comando para crear/editar: sudo nano /etc/httpd/conf.d/misdatos.conf
+
+Código a pegar:
+Listen 8080
+
+<VirtualHost *:8080>
+    DocumentRoot /var/www/misdatos
+    ErrorLog /var/log/httpd/misdatos_error.log
+    CustomLog /var/log/httpd/misdatos_access.log combined
+</VirtualHost>
+
+
+------------------------------------------------------------------------
+5. CONFIGURACIÓN DE SEGURIDAD (FIREWALL Y SELINUX)
+------------------------------------------------------------------------
+# Permitir tráfico web estándar en el puerto 80
+sudo firewall-cmd --permanent --add-service=http
+
+# Permitir tráfico web en el puerto alternativo 8080
+sudo firewall-cmd --permanent --add-port=8080/tcp
+
+# Recargar el cortafuegos para aplicar los cambios
+sudo firewall-cmd --reload
+
+# Asignar contextos correctos de SELinux para evitar el error 403 Forbidden
+sudo chcon -R -t httpd_sys_content_t /var/www/holamundo
+sudo chcon -R -t httpd_sys_content_t /var/www/misdatos
+
+
+------------------------------------------------------------------------
+6. REINICIO DEL SERVIDOR Y VERIFICACIÓN
+------------------------------------------------------------------------
+# Reiniciar Apache para aplicar todas las configuraciones
+sudo systemctl restart httpd
+
+# Direcciones de prueba en el navegador:
+# Sitio 1: http://localhost
+# Sitio 2: http://localhost:8080
+========================================================================
