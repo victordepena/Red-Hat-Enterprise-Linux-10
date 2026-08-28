@@ -236,23 +236,6 @@ La base técnica de la modernización de estas prácticas es la documentación o
 
 ---
 
-## 🏁 Estado
-
-| Área | Estado |
-|---|---|
-| Estructura del repositorio | ✅ |
-| README principal | ✅ |
-| READMEs por módulo | ✅ |
-| Navegación | ✅ |
-| Modernización RHEL 10 | ✅ |
-| Placeholders de YouTube | ✅ |
-| Plantilla de evidencias | ✅ |
-| Scripts auxiliares | 🟡 Base preparada |
-| URLs reales de playlists | ⏳ Faltan los enlaces |
-| Capturas propias | ⏳ Se añaden con las evidencias |
-
----
-
 <div align="center">
 
 **Red Hat Enterprise Linux 10 · Laboratorios documentados como infraestructura real**
