@@ -1,0 +1,28 @@
+=====================================================================
+PRACTICA RHEL 10: CONFIGURACION DE GRUB Y RECUPERACION DE CONTRASEÑA
+=====================================================================
+
+PARTE 1: CONFIGURACIÓN DEL TIEMPO DE ESPERA DE GRUB (20 SEGUNDOS)
+---------------------------------------------------------------------
+1. Editar el archivo de configuración por defecto de GRUB:
+   sudo nano /etc/default/grub
+   (Dentro del archivo, modificar o añadir: GRUB_TIMEOUT=20)
+
+2. Regenerar y aplicar la nueva configuración de GRUB:
+   sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+PARTE 2: RECUPERACIÓN DE CONTRASEÑA ROOT (SISTEMA EN SOLO LECTURA)
+---------------------------------------------------------------------
+1. Remontar la raíz en modo Lectura/Escritura (Solución al error 'Read-only file system'):
+   mount -o remount,rw /
+
+2. Cambiar la contraseña del usuario administrador (root):
+   passwd root
+
+3. Forzar el reetiquetado obligatorio de seguridad de SELinux:
+   touch /.autorelabel
+
+4. Reiniciar el sistema de forma segura para aplicar los cambios:
+   exec /sbin/init
+=====================================================================
