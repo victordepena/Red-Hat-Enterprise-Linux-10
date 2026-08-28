@@ -4,12 +4,7 @@
 
 [⬅️ Volver al índice](../README.md)
 
-## 🎬 Playlists
-
-- Práctica 01: `PENDIENTE`
-- Práctica 02: `PENDIENTE`
-- Práctica 03: `PENDIENTE`
-
+## 🎬 Playlists https://www.youtube.com/playlist?list=PLQ9VDfI34EckTTf6qa4jeIUFh4jxn7If-
 ---
 
 # 🧪 Práctica 01 — DNF y repositorios
