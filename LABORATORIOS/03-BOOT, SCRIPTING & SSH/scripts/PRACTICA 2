@@ -1,0 +1,29 @@
+1. Script de Backup con TAR
+nano backup.sh
+
+#!/bin/bash
+# Obtener la fecha y hora en formato dd-mm-yyyy:hh:mm
+FECHA_HORA=$(date +"%d-%m-%Y:%H:%M")
+
+# Crear el archivo comprimido TAR de la carpeta /home/redhat
+tar -czf /tmp/backup-$FECHA_HORA.tar.gz /home/hack.u
+
+echo "Backup creado exitosamente en /tmp/backup-$FECHA_HORA.tar.gz"
+
+chmod +x backup.sh
+./backup.sh
+
+2. Script para guardar ifconfig en el Escritorio
+nano guardar_ip.sh
+
+#!/bin/bash
+# Preguntar el nombre que el usuario desea ponerle al archivo
+read -p "Introduce el nombre que deseas para el archivo: " NOMBRE_ARCHIVO
+
+# Ejecutar ifconfig y redirigir el resultado al Escritorio de redhat
+ifconfig > /home/hack.u/Desktop/"$config1".txt
+
+echo "El archivo se ha creado en el Escritorio como: $config1.txt"
+
+chmod +x guardar_ip.sh
+./guardar_ip.sh
