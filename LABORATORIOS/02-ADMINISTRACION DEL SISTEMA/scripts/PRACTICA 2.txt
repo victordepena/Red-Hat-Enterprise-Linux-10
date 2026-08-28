@@ -1,0 +1,25 @@
+Tarea 1 Actualizar el sistema todos los días a las 11 p.m.
+
+sudo crontab -e
+0 23 * * * /usr/bin/dnf update -y >> /var/log/update_auto.log 2>&1
+sudo crontab -l
+
+-------------------------------------------
+-------------------------------------------
+
+Tarea 2 Reiniciar la máquina todos los domingos a las 3 a.m.
+
+sudo crontab -e
+0 3 * * 0 /sbin/shutdown -r now
+sudo crontab -l
+
+--------------------------------------------
+--------------------------------------------
+
+Tarea 3 Usar "at" para limpiar /tmp en 1 minuto
+
+ls /tmp
+sudo at now + 1 minute
+at> rm -rf /tmp/*
+at>
+sleep 65 && ls /tmp
