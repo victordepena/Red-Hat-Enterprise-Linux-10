@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔴 Red Hat Enterprise Linux 10
+# RED HAT ENTERPRISE LINUX 10
 
 ### Laboratorio de Administración Linux • Guía práctica • Evidencias • Automatización
 
