@@ -74,59 +74,6 @@ flowchart LR
 
 ---
 
-## 📚 Módulos
-
-### 01 · Fundamentos
-[➡️ Abrir laboratorio](01-fundamentos/README.md)
-
-Instalación de RHEL, configuración de red, usuarios/grupos y permisos de archivos.
-
-### 02 · Administración del sistema
-[➡️ Abrir laboratorio](02-administracion-del-sistema/README.md)
-
-DNF/repositorios, tareas programadas con cron y at, y administración de un disco adicional.
-
-### 03 · Boot, scripting y SSH
-[➡️ Abrir laboratorio](03-boot-scripting-ssh/README.md)
-
-GRUB, recuperación de acceso administrativo, backups TAR, scripts de captura de red y SSH con llaves.
-
-### 04 · Servicios de red
-[➡️ Abrir laboratorio](04-servicios-de-red/README.md)
-
-Apache/NGINX, virtual hosts, Postfix y CUPS.
-
-### 05 · Alta disponibilidad
-[➡️ Abrir laboratorio](05-alta-disponibilidad/README.md)
-
-Rsync, cluster Pacemaker + Corosync e implementación de HA web.
-
-### 06 · Seguridad
-[➡️ Abrir laboratorio](06-seguridad/README.md)
-
-Cifrado GPG, filtrado de red con firewalld/nftables, IDS Snort y 2FA para SSH.
-
-### 07 · Compartición y dominio
-[➡️ Abrir laboratorio](07-comparticion-y-dominio/README.md)
-
-NFS, Samba y un dominio Samba 4 con cliente Windows.
-
-### 08 · Contenedores
-[➡️ Abrir laboratorio](08-contenedores/README.md)
-
-NGINX en contenedor, Portainer y WordPress con Compose, adaptado al ecosistema RHEL 10.
-
-### 09 · Automatización
-[➡️ Abrir laboratorio](09-automatizacion/README.md)
-
-Webmin, Terraform en DigitalOcean y automatización de Windows/Linux con Ansible.
-
-### 10 · Issabel PBX
-[➡️ Abrir laboratorio](10-issabel-pbx/README.md)
-
-Proyecto original sobre Rocky Linux 8 + Issabel 5, separado del núcleo RHEL 10 por compatibilidad.
-
----
 
 ## 🎥 Playlists
 
