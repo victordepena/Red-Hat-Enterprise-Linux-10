@@ -1,0 +1,66 @@
+===============================================================================
+PRACTICA 2: DESPLIEGUE DE PORTAINER EN AWS EC2 (RHEL 10 / DOCKER)
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. CONEXION SSH A LA INSTANCIA EC2 (Desde tu terminal local)
+-------------------------------------------------------------------------------
+# Windows (PowerShell):
+cd $HOME\Downloads
+ssh -i "PWS_LINUX.pem" ec2-user@34.201.82.37
+
+# Linux / Mac / Git Bash:
+cd ~/Downloads
+chmod 400 PWS_LINUX.pem
+ssh -i PWS_LINUX.pem ec2-user@34.201.82.37
+
+
+-------------------------------------------------------------------------------
+2. CREAR VOLUMEN PERSISTENTE PARA PORTAINER
+-------------------------------------------------------------------------------
+docker volume create portainer_data
+
+
+-------------------------------------------------------------------------------
+3. DESPLEGAR Y EJECUTAR EL CONTENEDOR DE PORTAINER
+-------------------------------------------------------------------------------
+docker run -d \
+  -p 9000:9000 \
+  -p 9443:9443 \
+  --name portainer \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce:latest
+
+
+-------------------------------------------------------------------------------
+4. VERIFICAR ESTADO DEL CONTENEDOR
+-------------------------------------------------------------------------------
+# Confirmar que el contenedor 'portainer' está activo y corriendo
+docker ps
+
+# Probar la conectividad local dentro de la máquina
+curl -I http://127.0.0.1:9000
+
+
+-------------------------------------------------------------------------------
+5. CONFIGURACION DE SEGURIDAD EN AWS (SECURITY GROUP)
+-------------------------------------------------------------------------------
+Asegúrate de tener abiertos los siguientes puertos de entrada (Inbound Rules)
+en el Security Group de tu instancia EC2:
+
+- Tipo: Custom TCP | Puerto: 9000 | Origen: 0.0.0.0/0 (Acceso Web HTTP)
+- Tipo: Custom TCP | Puerto: 9443 | Origen: 0.0.0.0/0 (Acceso Web HTTPS)
+
+
+-------------------------------------------------------------------------------
+6. ACCESO WEB A LA INTERFAZ DE PORTAINER
+-------------------------------------------------------------------------------
+Abre tu navegador e ingresa a una de las siguientes direcciones:
+
+- HTTP:  http://34.201.82.37:9000
+- HTTPS: https://34.201.82.37:9443
+
+(Al ingresar por primera vez, define la contraseña del usuario 'admin').
+===============================================================================
