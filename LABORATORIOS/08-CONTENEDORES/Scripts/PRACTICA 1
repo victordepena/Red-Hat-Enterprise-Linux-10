@@ -1,0 +1,79 @@
+===================================================================
+PRACTICA 1: INSTALACION Y CONFIGURACION DE DOCKER CON NGINX (RHEL 10)
+Estudiante: Victor Jose De Peña Bernard | Matricula: 2023-0506
+===================================================================
+
+1. PREPARAR EL SISTEMA E INSTALAR DOCKER ENGINE EN RHEL 10
+-------------------------------------------------------------------
+# Instalar utilidades basicas y configurar el repositorio oficial de Docker CE
+sudo dnf install -y dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+
+# Instalar el motor de Docker y sus componentes
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Iniciar y habilitar el servicio de containerd
+sudo systemctl enable --now containerd
+
+# Configurar compatibilidad de red para RHEL 10 (desactivar gestion directa de iptables)
+sudo mkdir -p /etc/docker
+sudo bash -c 'cat <<EOF > /etc/docker/daemon.json
+{
+  "iptables": false
+}
+EOF'
+
+# Iniciar y habilitar el servicio de Docker
+sudo systemctl daemon-reload
+sudo systemctl enable --now docker
+
+# Agregar el usuario actual al grupo docker para ejecutar comandos sin sudo
+sudo usermod -aG docker $USER
+newgrp docker
+
+
+2. CONFIGURAR EL FIREWALL DEL SISTEMA (FIREWALLD)
+-------------------------------------------------------------------
+# Permitir el trafico en el puerto 8888 a traves de firewalld
+sudo firewall-cmd --permanent --add-port=8888/tcp
+sudo firewall-cmd --reload
+
+
+3. CREAR LA ESTRUCTURA DEL VOLUMEN PERSISTENTE Y LA PAGINA WEB
+-------------------------------------------------------------------
+# Crear el directorio local para almacenar los archivos del sitio web
+sudo mkdir -p /home/website
+
+# Crear el archivo index.html con los datos del estudiante
+sudo bash -c 'cat <<EOF > /home/website/index.html
+<!DOCTYPE html>
+<html>
+<head><title>Practica Docker</title></head>
+<body>
+    <h1>Victor Jose De Peña Bernard</h1>
+    <h2>2023-0506</h2>
+</body>
+</html>
+EOF'
+
+
+4. DESCARGAR LA IMAGEN Y DESPLEGAR EL CONTENEDOR NGINX
+-------------------------------------------------------------------
+# Descargar la imagen oficial de NGINX desde Docker Hub
+docker pull nginx
+
+# Desplegar el contenedor mapeando el puerto 8888:80 y con flag :z para SELinux
+docker run -d \
+  --name mi-nginx \
+  -p 8888:80 \
+  -v /home/website:/usr/share/nginx/html:z \
+  nginx
+
+
+5. VERIFICACION DE FUNCIONAMIENTO
+-------------------------------------------------------------------
+# Verificacion local desde la terminal SSH
+curl http://127.0.0.1:8888
+
+# Verificacion remota desde el navegador web de la PC
+# URL: http://34.201.82.37:8888
