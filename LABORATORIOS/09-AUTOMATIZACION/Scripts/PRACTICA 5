@@ -1,0 +1,55 @@
+===============================================================================
+PRACTICA 5: CREACIÓN Y EJECUCIÓN DE PLAYBOOKS DE ANSIBLE
+===============================================================================
+
+-------------------------------------------------------------------------------
+PLAYBOOK 1: INSTALAR NOTEPAD++ EN MAQUINA WINDOWS (ansible2)
+-------------------------------------------------------------------------------
+# 1. Instalar la colección de Chocolatey en el Controller:
+ansible-galaxy collection install chocolatey.chocolatey
+
+# 2. Crear el archivo install_notepad.yml:
+cat << 'EOF' > install_notepad.yml
+---
+- name: Instalar Notepad++ en maquina Windows (ansible2)
+  hosts: win
+  tasks:
+    - name: Asegurar que el gestor de paquetes Chocolatey esté instalado
+      chocolatey.chocolatey.win_chocolatey:
+        name: chocolatey
+        state: present
+
+    - name: Instalar Notepad++ via Chocolatey
+      chocolatey.chocolatey.win_chocolatey:
+        name: notepadplusplus
+        state: present
+EOF
+
+# 3. Ejecutar el Playbook para Windows:
+ansible-playbook install_notepad.yml
+
+-------------------------------------------------------------------------------
+PLAYBOOK 2: INSTALAR E INICIAR NGINX EN VM LINUX (ansible1)
+-------------------------------------------------------------------------------
+# 1. Crear el archivo install_nginx.yml:
+cat << 'EOF' > install_nginx.yml
+---
+- name: Instalar e iniciar NGINX en maquina Linux (ansible1)
+  hosts: linux
+  become: true
+  tasks:
+    - name: Instalar paquete NGINX
+      package:
+        name: nginx
+        state: present
+
+    - name: Iniciar y habilitar servicio NGINX
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+EOF
+
+# 2. Ejecutar el Playbook para Linux:
+ansible-playbook install_nginx.yml
+===============================================================================
