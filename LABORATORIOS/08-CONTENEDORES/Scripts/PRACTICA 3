@@ -1,0 +1,91 @@
+===============================================================================
+PRACTICA 3: DESPLIEGUE DE WORDPRESS Y MYSQL CON DOCKER COMPOSE EN AWS EC2
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. CONEXION SSH A LA INSTANCIA EC2 (Desde tu terminal local)
+-------------------------------------------------------------------------------
+# Windows (PowerShell):
+cd $HOME\Downloads
+ssh -i "PWS_LINUX.pem" ec2-user@34.201.82.37
+
+# Linux / Mac / Git Bash:
+cd ~/Downloads
+chmod 400 PWS_LINUX.pem
+ssh -i PWS_LINUX.pem ec2-user@34.201.82.37
+
+
+
+-------------------------------------------------------------------------------
+3. CREAR DIRECTORIO DEL PROYECTO Y ARCHIVO DOCKER-COMPOSE.YML
+-------------------------------------------------------------------------------
+mkdir -p ~/practica3-wordpress
+cd ~/practica3-wordpress
+
+cat << 'EOF' > docker-compose.yml
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: wordpress-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress_root_pass
+      MYSQL_DATABASE: wordpress_db
+      MYSQL_USER: wordpress_user
+      MYSQL_PASSWORD: wordpress_pass
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress-app
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress_user
+      WORDPRESS_DB_PASSWORD: wordpress_pass
+      WORDPRESS_DB_NAME: wordpress_db
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+EOF
+
+
+-------------------------------------------------------------------------------
+4. DESPLEGAR Y GESTIONAR LA PILA DE CONTENEDORES
+-------------------------------------------------------------------------------
+# Levantar los servicios en segundo plano
+docker compose up -d
+
+# Verificar el estado de los contenedores
+docker ps
+
+# Ver logs del entorno para comprobar inicialización de MySQL y WordPress
+docker compose logs -f
+
+# Probar la conectividad local dentro del servidor
+curl -I http://127.0.0.1:8080
+
+
+-------------------------------------------------------------------------------
+5. REGLAS DE SEGURIDAD EN AWS (SECURITY GROUP)
+-------------------------------------------------------------------------------
+Asegúrate de tener habilitada la siguiente regla de entrada en AWS EC2:
+
+- Tipo: Custom TCP | Puerto: 8080 | Origen: 0.0.0.0/0 (Acceso Web WordPress)
+
+
+-------------------------------------------------------------------------------
+6. ACCESO WEB Y CONFIGURACION DE WORDPRESS
+-------------------------------------------------------------------------------
+Abre tu navegador e ingresa a:
+http://34.201.82.37:8080
+
+Completa la instalación inicial del sitio en la interfaz gráfica de WordPress.
+===============================================================================
