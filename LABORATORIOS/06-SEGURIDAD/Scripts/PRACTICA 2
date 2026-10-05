@@ -1,0 +1,105 @@
+================================================================================
+PRACTICA 2 - IP TABLES & FIREWALL-CMD (RHEL 10)
+================================================================================
+Estudiante: Victor Jose De Pena Bernard
+Matricula: 2023-0506
+Institucion: Instituto Tecnologico de Las Americas (ITLA)
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+PASO 1: HABILITAR Y CONFIGURAR LOS SERVICIOS (HTTP, FTP, SSH)
+--------------------------------------------------------------------------------
+Antes de configurar las restricciones del firewall, se instalan, habilitan 
+y arrancan los servicios en RHEL 10.
+
+Comando para instalar el servidor FTP (necesario para evitar error de unidad no encontrada):
+$ sudo dnf install -y vsftpd
+
+Comandos para iniciar y habilitar todos los servicios:
+$ sudo systemctl enable --now httpd vsftpd sshd
+
+Comando para verificar el estado de los servicios (deben decir active running):
+$ sudo systemctl status httpd vsftpd sshd
+
+Comando para comprobar que los puertos estan escuchando (80, 21, 22):
+$ ss -tulpn | grep -E '21|22|80'
+
+Pruebas de funcionamiento local individuales:
+$ curl http://localhost
+$ ssh localhost
+$ ftp localhost
+
+--------------------------------------------------------------------------------
+PASO 2: BLOQUEO DE TRAFICO UTILIZANDO IP TABLES
+--------------------------------------------------------------------------------
+Para evitar interferencias con firewalld durante esta fase, detenemos firewalld:
+$ sudo systemctl stop firewalld
+
+Comandos individuales para bloquear los puertos 80 (HTTP), 21 (FTP) y 22 (SSH):
+$ sudo iptables -A INPUT -p tcp --dport 80 -j DROP
+$ sudo iptables -A INPUT -p tcp --dport 21 -j DROP
+$ sudo iptables -A INPUT -p tcp --dport 22 -j DROP
+
+Comando para mostrar los resultados y verificar las reglas aplicadas:
+$ sudo iptables -L INPUT -v -n
+
+*Resultado esperado:* Las conexiones externas o locales hacia estos puertos 
+quedaran en 'Timeout' (no habra respuesta).
+
+--------------------------------------------------------------------------------
+PASO 3: DESBLOQUEO DE TRAFICO UTILIZANDO IP TABLES
+--------------------------------------------------------------------------------
+Comandos individuales para remover las reglas de bloqueo anteriores (-D = Delete):
+$ sudo iptables -D INPUT -p tcp --dport 80 -j DROP
+$ sudo iptables -D INPUT -p tcp --dport 21 -j DROP
+$ sudo iptables -D INPUT -p tcp --dport 22 -j DROP
+
+Comando para mostrar los resultados y comprobar la limpieza de la cadena:
+$ sudo iptables -L INPUT -v -n
+
+*Resultado esperado:* El acceso a los servicios HTTP, FTP y SSH se restablece 
+de manera inmediata.
+
+--------------------------------------------------------------------------------
+PASO 4: BLOQUEO DE TRAFICO UTILIZANDO FIREWALL-CMD (NATIVO EN RHEL 10)
+--------------------------------------------------------------------------------
+Volvemos a activar el servicio de firewalld:
+$ sudo systemctl start firewalld
+
+Comandos individuales para aplicar las Rich Rules de bloqueo de forma explicita (Reject):
+$ sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" port port="80" protocol="tcp" reject'
+$ sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" port port="21" protocol="tcp" reject'
+$ sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" port port="22" protocol="tcp" reject'
+
+Recargar el firewall para aplicar los cambios en memoria:
+$ sudo firewall-cmd --reload
+
+Comando para mostrar los resultados del bloqueo:
+$ sudo firewall-cmd --list-all
+
+*Resultado esperado:* En la seccion 'rich rules' se apreciaran las tres reglas 
+de rechazo. Cualquier intento de conexion recibira un mensaje inmediato de 
+'Connection refused'.
+
+--------------------------------------------------------------------------------
+PASO 5: DESBLOQUEO DE TRAFICO UTILIZANDO FIREWALL-CMD
+--------------------------------------------------------------------------------
+Comandos individuales para remover las Rich Rules de bloqueo aplicadas:
+$ sudo firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" port port="80" protocol="tcp" reject'
+$ sudo firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" port port="21" protocol="tcp" reject'
+$ sudo firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" port port="22" protocol="tcp" reject'
+
+Comandos individuales para permitir explicitamente los servicios de forma limpia:
+$ sudo firewall-cmd --permanent --add-service=http
+$ sudo firewall-cmd --permanent --add-service=ftp
+$ sudo firewall-cmd --permanent --add-service=ssh
+
+Recargar el firewall para aplicar los cambios de limpieza:
+$ sudo firewall-cmd --reload
+
+Comando para mostrar los resultados finales de exito:
+$ sudo firewall-cmd --list-all
+
+*Resultado esperado:* En la seccion 'services:' se podran ver 'http ftp ssh' 
+y las conexiones desde equipos cliente volveran a ser exitosas.
+================================================================================
