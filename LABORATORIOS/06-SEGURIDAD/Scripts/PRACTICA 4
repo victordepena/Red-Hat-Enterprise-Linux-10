@@ -1,0 +1,108 @@
+
+========================================================================
+GUÍA DE INSTALACIÓN Y CONFIGURACIÓN DE MULTI-FACTOR AUTHENTICATION (MFA)
+PARA ACCESO SSH EN RED HAT ENTERPRISE LINUX (RHEL 10)
+========================================================================
+
+Este documento detalla los comandos y configuraciones necesarios para implementar 
+Google Authenticator (2FA) como requisito mandatorio junto a la contraseña local 
+para el inicio de sesión vía SSH, adaptado a las políticas estrictas de RHEL 10.
+
+------------------------------------------------------------------------
+1. INSTALACIÓN Y CONFIGURACIÓN DE GOOGLE AUTHENTICATOR (USUARIO: redhat)
+------------------------------------------------------------------------
+Ejecute los siguientes comandos en la terminal de la Máquina Virtual (VM) 
+estando logueado como el usuario regular ('redhat'), NO como root:
+
+# Habilitar el repositorio EPEL e instalar el módulo PAM de Google Authenticator
+sudo dnf install epel-release -y
+sudo dnf install google-authenticator -y
+
+# Inicializar el asistente de configuración del token OTP
+# (Responda a las preguntas interactivas con: y, y, y, n, y)
+google-authenticator
+
+Nota: Escanee el código QR gigante que aparece en pantalla utilizando la 
+aplicación de Google Authenticator en su dispositivo móvil. Guarde en un lugar 
+seguro la clave secreta (secret key) y los códigos de emergencia de respaldo.
+
+# Ajustar etiquetas de SELinux y permisos del archivo de seguridad generado
+sudo chcon -t auth_home_t /home/redhat/.google_authenticator
+sudo chmod 400 /home/redhat/.google_authenticator
+
+# Configurar temporalmente SELinux en modo permisivo para el laboratorio
+sudo setenforce 0
+
+
+------------------------------------------------------------------------
+2. CONFIGURACIÓN DEL MÓDULO PAM (Pluggable Authentication Modules)
+------------------------------------------------------------------------
+Es necesario indicarle a la pila de PAM que el entorno interactivo del 2FA 
+debe inicializarse de manera prioritaria al abrir una sesión SSH.
+
+Abra el archivo de configuración PAM correspondiente a SSH:
+$ sudo nano /etc/pam.d/sshd
+
+
+
+#%PAM-1.0
+auth       required     pam_google_authenticator.so nullok
+auth       substack     password-auth
+auth       include      postlogin
+auth       substack     system-auth
+
+
+------------------------------------------------------------------------
+3. CONFIGURACIÓN DEL SERVICIO SSH (sshd_config)
+------------------------------------------------------------------------
+En RHEL 10, la directiva obsoleta 'ChallengeResponseAuthentication' debe ser 
+desactivada del archivo de Red Hat para evitar rupturas de conexión, y se debe 
+forzar la secuencia estricta en el archivo de configuración principal.
+
+# Desactivar la directiva heredada en el archivo modular secundario
+sudo sed -i 's/^ChallengeResponseAuthentication/# ChallengeResponseAuthentication/' /etc/ssh/sshd_config.d/50-redhat.conf
+
+# Abrir el archivo de configuración principal de SSH
+sudo nano /etc/ssh/sshd_config
+
+Vaya al puro final del archivo '/etc/ssh/sshd_config' y pegue las siguientes líneas:
+
+# Forzar Doble Factor de Autenticación Nativo en RHEL 10
+UsePAM yes
+KbdInteractiveAuthentication yes
+AuthenticationMethods password keyboard-interactive
+
+Nota: El espacio entre 'password' y 'keyboard-interactive' le indica de forma 
+secuencial a OpenSSH que requiere el Método A (Contraseña) Y LUEGO el Método B (2FA).
+
+# Verificar que la sintaxis general no contenga errores (Debe quedar en silencio)
+sudo sshd -t
+
+# Reiniciar el demonio del servidor SSH para aplicar los cambios de forma limpia
+sudo systemctl restart sshd
+
+
+------------------------------------------------------------------------
+4. DEMOSTRACIÓN DE ACCESO EXITOSO DESDE LA MÁQUINA HOST (WINDOWS)
+------------------------------------------------------------------------
+Abra la terminal de su máquina física (PowerShell o CMD) y ejecute el comando 
+de conexión remota hacia la IP asignada a su Máquina Virtual:
+
+C:\Users\victo> ssh redhat@172.27.222.108
+
+FLUJO INTERACTIVO ESPERADO EN LA TERMINAL:
+
+redhat@172.27.222.108's password: [Escriba su contraseña normal de Linux y pulse Enter]
+
+Verification code: [Introduzca los 6 dígitos dinámicos de su Google Authenticator y pulse Enter]
+
+Activate the Web Console with: systemctl enable --now cockpit.socket
+
+Last login: Wed Jul  8 21:12:05 2026 from 172.27.208.1
+[redhat@linux ~]$ 
+
+========================================================================
+                      FIN DEL PROCEDIMIENTO DE LABORATORIO
+========================================================================
+
+```
