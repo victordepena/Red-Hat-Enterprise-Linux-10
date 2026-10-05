@@ -1,0 +1,29 @@
+===============================================================================
+PRACTICA 4: COMANDOS AD-HOC DE ANSIBLE
+===============================================================================
+
+-------------------------------------------------------------------------------
+EJERCICIO 1: COPIAR UN ARCHIVO TXT EN WINDOWS (MÓDULO win_copy)
+-------------------------------------------------------------------------------
+# Requisito: Debe existir un archivo 'archivo.txt' en el Escritorio del usuario ansible en la máquina Windows.
+#
+# Ejecutar desde el Controller el siguiente comando ad-hoc para copiar el archivo desde el Escritorio
+# hacia la carpeta Documentos de la máquina Windows (ansible2):
+
+ansible win -m win_copy -a "src=C:/Users/ansible/Desktop/archivo.txt dest=C:/Users/ansible/Documents/archivo.txt remote_src=yes"
+
+# Explicación de parámetros:
+# -m win_copy  : Módulo para copiar archivos en Windows.
+# remote_src=yes : Le indica a Ansible que el archivo origen ya está dentro del cliente Windows.
+
+-------------------------------------------------------------------------------
+EJERCICIO 2: REINICIAR LA VM LINUX (MÓDULO reboot)
+-------------------------------------------------------------------------------
+# Ejecutar desde el Controller el siguiente comando ad-hoc para reiniciar ansible1:
+
+ansible ansible1 -m reboot --become
+
+# Explicación de parámetros:
+# -m reboot : Módulo encargado de reiniciar la máquina de forma segura y esperar a que vuelva a responder.
+# --become  : Eleva privilegios usando sudo (requerido para reiniciar el sistema).
+===============================================================================
