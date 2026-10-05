@@ -1,0 +1,66 @@
+===============================================================================
+PRACTICA 1: INSTALACIÓN Y CONFIGURACIÓN DE WEBMIN EN RHEL 10
+===============================================================================
+
+-------------------------------------------------------------------------------
+PASO 1: INSTALACIÓN DE WEBMIN
+-------------------------------------------------------------------------------
+# Abrir una terminal en tu servidor RHEL 10 con privilegios de root o sudo.
+
+# 1. Instalar las dependencias necesarias
+sudo dnf install -y wget tar perl
+
+# 2. Descargar el paquete RPM oficial de Webmin
+wget https://www.webmin.com/download/rpm/webmin-current.rpm
+
+# 3. Instalar el paquete RPM descargado
+sudo dnf install -y ./webmin-current.rpm
+
+# 4. Habilitar el puerto 10000 en el Firewall de RHEL para permitir acceso web
+sudo firewall-cmd --add-port=10000/tcp --permanent
+sudo firewall-cmd --reload
+
+# 5. Comprobar que el servicio de Webmin esté activo y ejecutándose
+sudo systemctl status webmin
+
+-------------------------------------------------------------------------------
+PASO 2: ACCESO Y RUTAS DE ADMINISTRACIÓN EN LA INTERFAZ WEB
+-------------------------------------------------------------------------------
+# Abre tu navegador e ingresa a: https://TU_IP_SERVIDOR:10000
+# Nota: Acepta la advertencia de certificado SSL autofirmado.
+# Inicia sesión con el usuario 'root' de tu sistema RHEL 10.
+
+1. Administración de Usuarios (Crear y eliminar cuentas):
+   -> Navega en el menú lateral a: System -> Users and Groups
+   -> Para CREAR: Haz clic en "Create a new user", completa el nombre/clave y guarda.
+   -> Para ELIMINAR: Selecciona el usuario de la lista y haz clic en "Delete".
+
+2. Gestión de Servicios (Iniciar, detener, reiniciar servicio SSH):
+   -> Navega a: System -> Bootup and Shutdown
+   -> Busca el servicio 'sshd' en la lista.
+   -> Selecciona la casilla de 'sshd' y usa los botones inferiores para:
+      * Start (Iniciar)
+      * Stop (Detener)
+      * Restart (Reiniciar)
+
+3. Configuración de Red (Configurar IP estática):
+   -> Navega a: Networking -> Network Configuration -> Network Interfaces
+   -> Selecciona tu interfaz de red activa (ej. eth0, ens33, enp0s3).
+   -> Cambia la configuración de DHCP a Estática (Static), asigna IP, Máscara y Gateway.
+   -> Aplica los cambios guardando la configuración.
+
+4. Administración de Software (Actualizar, instalar y eliminar paquetes):
+   -> Navega a: System -> Software Packages
+   -> Para INSTALAR: Selecciona "Package from YUM/DNF", escribe el nombre (ej. htpy/vim) e instala.
+   -> Para ELIMINAR: Busca el paquete en "Search for Package" y presiona "Uninstall".
+
+5. Gestión de Archivos y Directorios (Explorar, editar y eliminar):
+   -> Navega a: Tools -> File Manager
+   -> Permite explorar la estructura de directorios del servidor.
+   -> Haz doble clic en un archivo para VER/EDITAR su contenido.
+   -> Selecciona un archivo/directorio y haz clic en "Delete" para eliminarlo.
+
+6. Monitorización del Sistema (CPU, Memoria, Almacenamiento):
+   -> Navega a: System -> Dashboard (o System Information)
+   -> Visualiza los gráficos en tiempo real del uso de CPU, Memoria RAM y espacio en disco.
+===============================================================================
