@@ -1,0 +1,94 @@
+================================================================================
+GUÍA DEFINITIVA: INSTALACIÓN, CONFIGURACIÓN Y EJECUCIÓN DE SNORT 3 EN RHEL 10
+================================================================================
+
+1. INSTALACIÓN DE DEPENDENCIAS DEL SISTEMA Y REPOSITORIO CRB
+--------------------------------------------------------------------------------
+sudo subscription-manager repos --enable codeready-builder-for-rhel-10-x86_64-rpms
+sudo dnf -y update
+sudo dnf -y groupinstall "Development Tools"
+sudo dnf -y install cmake gcc-c++ libpcap-devel pcre2-devel openssl-devel zlib-devel luajit-devel libdnet libdnet-devel hwloc hwloc-devel
+
+2. COMPILACIÓN E INSTALACIÓN DE LIBDAQ (DATA ACQUISITION LIBRARY)
+--------------------------------------------------------------------------------
+cd /usr/src
+sudo git clone https://github.com/snort3/libdaq.git
+cd libdaq
+sudo ./bootstrap
+sudo ./configure
+sudo make
+sudo make install
+
+3. CONFIGURACIÓN DEL ENTORNO PARA COMPILAR SNORT 3
+--------------------------------------------------------------------------------
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+
+4. COMPILACIÓN E INSTALACIÓN DE SNORT 3
+--------------------------------------------------------------------------------
+cd /usr/src
+sudo git clone https://github.com/snort3/snort3.git
+cd snort3
+rm -rf build/
+sudo -E ./configure_cmake.sh --prefix=/usr/local
+cd build
+sudo make -j$(nproc)
+sudo make install
+
+5. CONFIGURACIÓN GLOBAL DE LIBRERÍAS (SOLUCIÓN DEFINITIVA ERRORES EN LAZADO)
+--------------------------------------------------------------------------------
+echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/snort.conf
+sudo ldconfig
+
+6. CREACIÓN DE REGLAS DE DETECCIÓN PERSONALIZADAS (LOCAL.RULES)
+--------------------------------------------------------------------------------
+sudo mkdir -p /usr/local/etc/snort/rules
+
+# Generar el archivo local.rules con las 4 reglas solicitadas
+sudo tee /usr/local/etc/snort/rules/local.rules << 'EOF'
+# 1. Detectar todo el trafico ICMP (Ping) hacia el host
+alert icmp any any -> any any (msg:"ALERTA: Trafico ICMP (Ping) Detectado"; sid:1000001; rev:1;)
+
+# 2. Detectar todo el trafico hacia el puerto 21/tcp (FTP)
+alert tcp any any -> any 21 (msg:"ALERTA: Intento de conexion FTP (Puerto 21)"; sid:1000002; rev:1;)
+
+# 3. Detectar todo el trafico hacia el puerto 22/tcp (SSH)
+alert tcp any any -> any 22 (msg:"ALERTA: Intento de conexion SSH (Puerto 22)"; sid:1000003; rev:1;)
+
+# 4. Detectar todo el trafico hacia el puerto 80/tcp (HTTP)
+alert tcp any any -> any 80 (msg:"ALERTA: Intento de conexion HTTP (Puerto 80)"; sid:1000004; rev:1;)
+EOF
+
+7. VINCULACIÓN INYECCIÓN LIMPIA EN SNORT.LUA (EVITA ERRORES DE SINTAXIS LUA)
+--------------------------------------------------------------------------------
+# Agregar el bloque ips perfectamente estructurado al final del archivo snort.lua
+sudo tee -a /usr/local/etc/snort/snort.lua << 'EOF'
+
+ips = {
+    variables = default_variables,
+    include = '/usr/local/etc/snort/rules/local.rules'
+}
+EOF
+
+8. VALIDACIÓN DE LA CONFIGURACIÓN (PRUEBA DE SINTAXIS)
+--------------------------------------------------------------------------------
+sudo /usr/local/bin/snort -c /usr/local/etc/snort/snort.lua -T
+
+9. EJECUCIÓN EN MODO ESCUCHA (REEMPLAZAR ens160 POR TU INTERFAZ SI ES DISTINTA)
+--------------------------------------------------------------------------------
+sudo /usr/local/bin/snort -c /usr/local/etc/snort/snort.lua -i ens160 -A alert_fast
+
+================================================================================
+PRUEBAS DESDE EL HOST ATACANTE (TERMINAL EXTERNA)
+================================================================================
+# 1. Prueba Ping
+ping -c 3 <IP_DE_RHEL10>
+
+# 2. Prueba Puerto 21 (FTP)
+nc -zv <IP_DE_RHEL10> 21
+
+# 3. Prueba Puerto 22 (SSH)
+ssh <IP_DE_RHEL10>
+
+# 4. Prueba Puerto 80 (HTTP)
+curl http://<IP_DE_RHEL10>
+================================================================================
