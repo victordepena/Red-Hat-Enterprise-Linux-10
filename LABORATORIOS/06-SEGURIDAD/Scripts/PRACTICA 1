@@ -1,0 +1,32 @@
+===============================================================================
+  GUÍA DE USO DE GPG2 EN RHEL 10 - CIFRADO Y DESCIFRADO (AUDITORÍA)
+===============================================================================
+
+# 1. Instalar la herramienta GnuPG (GPG2) en RHEL 10
+sudo dnf install -y gnupg2
+
+# 2. Generar el par de llaves – opción 1, tamaño 3072, validez 1 año
+gpg --full-generate-key
+
+# 3. Crear el directorio de trabajo e ingresar a él
+mkdir ~/auditoria_rhel10
+cd ~/auditoria_rhel10
+
+# 4. Crear archivo con información confidencial
+echo "Este es un secreto de auditoría para la exposición de RHEL 10" > secreto.txt
+
+# 5. Cifrar el archivo usando tu correo de identidad GPG
+# (Recuerda cambiar tu_correo@redhat.com por el que configuraste en el paso 2)
+gpg --recipient tu_correo@redhat.com --encrypt secreto.txt
+
+# 6. Intentar acceder al archivo cifrado (Ver el contenido protegido)
+cat secreto.txt.gpg
+
+# 7. Eliminar el archivo original – refuerza que solo queda la versión cifrada
+rm secreto.txt
+
+# 8. Descifrar con la llave privada (pedirá la contraseña)
+gpg --output secreto_recuperado.txt --decrypt secreto.txt.gpg
+
+# 9. Verificar el contenido recuperado
+cat secreto_recuperado.txt
