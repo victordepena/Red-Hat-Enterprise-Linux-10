@@ -1,0 +1,34 @@
+====================================================================
+PRÁCTICA 1: COMPARTIR ARCHIVOS ENTRE LINUX UTILIZANDO NFS (RHEL 10)
+====================================================================
+
+--- SERVIDOR NFS ---
+sudo dnf install -y nfs-utils
+sudo systemctl enable --now nfs-server
+sudo mkdir -p /OS3
+sudo touch /OS3/Adrian{1..100}.txt
+sudo chmod -R 777 /OS3
+sudo chown -R nobody:nobody /OS3
+echo "/OS3 *(rw,sync,no_root_squash)" | sudo tee -a /etc/exports
+sudo exportfs -arv
+sudo firewall-cmd --permanent --add-service=nfs
+sudo firewall-cmd --permanent --add-service=rpc-bind
+sudo firewall-cmd --permanent --add-service=mountd
+sudo firewall-cmd --reload
+
+--- CLIENTE LINUX ---
+sudo dnf install -y nfs-utils
+sudo mkdir -p /mnt/OS3_cliente
+sudo mount -t nfs <IP_SERVIDOR>:/OS3 /mnt/OS3_cliente
+ls -la /mnt/OS3_cliente
+
+--- PERSISTENCIA (/etc/fstab) ---
+# Agregar la línea a /etc/fstab:
+# <IP_SERVIDOR>:/OS3  /mnt/OS3_cliente  nfs  defaults,_netdev  0 0
+
+sudo systemctl daemon-reload
+sudo umount /mnt/OS3_cliente
+sudo mount -a
+df -h | grep OS3_cliente
+ls /mnt/OS3_cliente | wc -l
+sudo reboot
