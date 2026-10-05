@@ -1,0 +1,87 @@
+===============================================================================
+PRACTICA 3: INSTALACIÓN Y CONFIGURACIÓN DE ANSIBLE
+===============================================================================
+
+-------------------------------------------------------------------------------
+PASO 1: INSTALAR ANSIBLE EN EL CONTROLLER (RHEL 10)
+-------------------------------------------------------------------------------
+# 1. Habilitar repositorio EPEL e instalar Ansible + Python Pip
+sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+sudo dnf install -y ansible python3-pip
+
+# 2. Instalar pywinrm para poder conectarse a máquinas Windows por WinRM
+pip install pywinrm
+
+# 3. Verificar que Ansible esté instalado correctamente
+ansible --version
+
+-------------------------------------------------------------------------------
+PASO 2: CONFIGURACIÓN DEL CLIENTE LINUX (ansible1 - Ubuntu AWS EC2)
+-------------------------------------------------------------------------------
+# Conéctate por SSH a la VM de AWS:
+ssh ubuntu@IP_PUBLICA_EC2
+
+# Dentro de la VM cliente Linux (ansible1), ejecuta los siguientes comandos:
+# 1. Crear el usuario 'ansible'
+sudo useradd -m -s /bin/bash ansible
+
+# 2. Asignar contraseña al usuario 'ansible'
+echo "ansible:Password123!" | sudo chpasswd
+
+# 3. Conceder permisos sudo sin contraseña
+echo "ansible ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ansible
+
+# Sal de la VM cliente
+exit
+
+# 4. En el Ansible Controller (RHEL 10), genera el par de llaves SSH (si no lo tenías):
+ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa
+
+# 5. Copiar la llave pública SSH al usuario 'ansible' del cliente Linux:
+ssh-copy-id ansible@IP_PUBLICA_EC2
+
+# 6. Probar inicio de sesión directo sin contraseña:
+ssh ansible@IP_PUBLICA_EC2
+
+-------------------------------------------------------------------------------
+PASO 3: CONFIGURACIÓN DEL CLIENTE WINDOWS (ansible2 - VM Windows)
+-------------------------------------------------------------------------------
+# En la máquina Windows (ansible2), abre PowerShell como ADMINISTRADOR y ejecuta:
+
+# 1. Habilitar soporte TLS 1.2 y descargar el script de configuración WinRM de Ansible
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
+$file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+(New-Object System.Net.WebClient).DownloadFile($url, $file)
+
+# 2. Ejecutar el script para configurar WinRM
+powershell.exe -ExecutionPolicy Unrestricted -File $file
+
+# 3. Crear el usuario 'ansible' con permisos de Administrador local
+Net User ansible Password123! /add
+Net LocalGroup Administrators ansible /add
+
+-------------------------------------------------------------------------------
+PASO 4: CREACIÓN DEL INVENTARIO DE ANSIBLE (/etc/ansible/hosts)
+-------------------------------------------------------------------------------
+# En el Ansible Controller (RHEL 10), crea la carpeta de configuración si no existe:
+sudo mkdir -p /etc/ansible
+
+# Edita o crea el archivo /etc/ansible/hosts:
+sudo bash -c 'cat << EOF > /etc/ansible/hosts
+[linux]
+ansible1 ansible_host=IP_PUBLICA_EC2 ansible_user=ansible
+
+[win]
+ansible2 ansible_host=IP_WINDOWS_CLIENTE ansible_user=ansible ansible_password=Password123! ansible_connection=winrm ansible_winrm_server_cert_validation=ignore
+EOF'
+
+-------------------------------------------------------------------------------
+PASO 5: PRUEBA DE CONEXIÓN MEDIANTE MÓDULO PING
+-------------------------------------------------------------------------------
+# Probamos la conexión al grupo Linux (ansible1):
+ansible linux -m ping
+
+# Probamos la conexión al grupo Windows (ansible2):
+ansible win -m win_ping
+===============================================================================
